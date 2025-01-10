@@ -345,3 +345,131 @@ document.addEventListener("DOMContentLoaded", () => {
 function randRange(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+// Themes
+// Custom Themes
+function loadCustomThemes() {
+  let customThemes = localStorage.getItem("customThemes")
+  customThemes = customThemes.split(",")
+  if (customThemes[0] && customThemes.length == 1) {
+    return
+  } else {
+    customThemes.forEach(addToCustomThemes)
+  }
+}
+function addToCustomThemes(item) {
+  if (!item) {
+    return
+  }
+  let dropdownbox = document.getElementsByClassName("td")[0]
+  const newTheme = Object.assign(document.createElement("option"), {
+    text: item.toString(),
+    value: item.toString(),
+  })
+  dropdownbox.add(newTheme)
+}
+function newCustomTheme() {
+  let themeName = prompt("Give your theme a name:")
+  let customThemes = localStorage.getItem("customThemes")
+  customThemes = customThemes.split(",")
+  if (customThemes.indexOf(themeName) != -1) {
+    alert("This name already exists!")
+    return
+  }
+  if (
+    themeName == "catppuccinMocha" ||
+    themeName == "catppuccinMacchiato" ||
+    themeName == "catppuccinFrappe" ||
+    themeName == "catppuccinLatte" ||
+    themeName == "Inverted" ||
+    themeName == "d"
+  ) {
+    alert("This theme name cannot be used.")
+    return
+  }
+  if (themeName.includes(",")) {
+    alert("Name cannot contain a comma.")
+    return
+  }
+  if (localStorage.getItem("customThemes")) {
+    localStorage.setItem("customThemes", localStorage.getItem("customThemes") + "," + themeName)
+  } else {
+    localStorage.setItem("customThemes", themeName)
+  }
+  localStorage.setItem("theme-" + themeName, ":root {}")
+  window.location = window.location
+}
+function deleteCustomTheme() {
+  let customThemes = localStorage.getItem("customThemes")
+  customThemes = customThemes.split(",")
+  let index = customThemes.indexOf(localStorage.getItem("theme"))
+  if (index !== -1) {
+    customThemes.splice(index, 1)
+  }
+  localStorage.setItem("customThemes", customThemes)
+  localStorage.removeItem("theme-" + localStorage.getItem("theme"))
+  localStorage.setItem("theme", "d")
+  window.location = window.location
+}
+function exportCustomTheme() {
+  const blob = new Blob([localStorage.getItem("theme-" + localStorage.getItem("theme"))], { type: "text/css" })
+  const url = URL.createObjectURL(blob)
+  const a = Object.assign(document.createElement("a"), {
+    href: url,
+    download: localStorage.getItem("theme"),
+  })
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+document.getElementById("et").addEventListener("change", importTheme, false)
+function importTheme(event) {
+  const file = event.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = function (event) {
+    const contents = event.target.result
+    localStorage.setItem("theme-" + localStorage.getItem("theme"), contents)
+    window.location = window.location
+  }
+  reader.readAsText(file)
+}
+loadCustomThemes()
+let themeId = localStorage.getItem("theme")
+if (themeId == "") {
+  themeId = "d"
+}
+if (
+  themeId == "catppuccinMocha" ||
+  themeId == "catppuccinMacchiato" ||
+  themeId == "catppuccinFrappe" ||
+  themeId == "catppuccinLatte" ||
+  themeId == "d" ||
+  themeId == "Inverted"
+) {
+  document.getElementById("currentThemeText").textContent = "Selected Theme: Default Themes"
+  document.getElementById("et").disabled = true
+  document.getElementById("ext").disabled = true
+  document.getElementById("dt").disabled = true
+} else {
+  document.getElementById("currentThemeText").textContent = "Selected Theme: " + themeId
+}
+if (document.URL.endsWith("?theme-code")) {
+  document.body.textContent = ""
+  l = document.createElement("p")
+  l.textContent = localStorage.getItem("theme-" + localStorage.getItem("theme"))
+  document.body.appendChild(l)
+}
+document.getElementsByClassName("td")[0].value = themeId
+const themeDropdown = document.getElementsByClassName("td")
+dropdown.addEventListener("change", () => {
+  const selectedValue = dropdown.value
+  localStorage.setItem("theme", selectedValue)
+  window.location = window.location
+})
+function themeChange(ele) {
+  const selTheme = ele.value
+  localStorage.setItem("theme", selTheme)
+  window.location = window.location
+}
